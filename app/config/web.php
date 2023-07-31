@@ -42,14 +42,14 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'contacts' => 'contact/index',
+                'contacts/delete/<id:\d+>' => 'contact/delete',
             ],
         ],
-        */
     ],
     'params' => $params,
 ];
