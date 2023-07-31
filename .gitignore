@@ -1,0 +1,6 @@
+/.idea
+/app/vendor/
+/docker/gitlab/logs/
+/data/*
+/app/storage/*
+/app/web/controllers/cookie.txt

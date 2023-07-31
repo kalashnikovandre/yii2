@@ -1,0 +1,71 @@
+version: '3.7'
+
+services:
+  mysql:
+    ports:
+      - "3306:3306"
+    image: library/mysql:8.0.34
+    restart: no
+    environment:
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=database
+      - MYSQL_TCP_PORT=3306
+    volumes:
+      - ./data/mysql/data:/var/lib/mysql
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "8080:8080"
+    restart: no
+    volumes:
+      - ./docker/nginx:/etc/nginx/conf.d
+      - ./app:/app
+      - ./data/logs/nginx:/var/log/nginx
+    links:
+      - php
+    depends_on:
+      - php
+    entrypoint: nginx -g 'daemon off;'
+    working_dir: /app
+
+  php:
+    ports:
+      - "9000:9000"
+    build:
+      context: ./
+      dockerfile: ./docker/php/Dockerfile
+    restart: no
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - ./docker/php/cron:/cron
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./app:/app
+    links:
+      - mysql
+      - redis
+    working_dir: /app
+
+  redis:
+    restart: no
+    ports:
+      - "6379:6379"
+    image: redis:alpine
+    command: redis-server --requirepass dg7f77hs7jhf8gbe112
+    volumes:
+      - ./data/redis/data:/data
+
+  mailpit:
+    image: 'axllent/mailpit:latest'
+    restart: no
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
+volumes:
+  app:
